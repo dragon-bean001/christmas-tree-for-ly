@@ -483,7 +483,7 @@ const GestureController = ({ onGesture, onMove, onStatus, debugMode }: any) => {
                  if (debugMode) onStatus(`DETECTED: ${name}`);
               }
               if (results.landmarks.length > 0) {
-                const speed = (0.5 - results.landmarks[0][0].x) * 0.25;
+                const speed = -(0.5 - results.landmarks[0][0].x) * 0.25;
                 onMove(Math.abs(speed) > 0.01 ? speed : 0);
               }
             } else { onMove(0); if (debugMode) onStatus("AI READY: NO HAND"); }
