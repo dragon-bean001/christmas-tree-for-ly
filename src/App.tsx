@@ -391,7 +391,7 @@ const Experience = ({ sceneState, rotationSpeed }: { sceneState: 'CHAOS' | 'FORM
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 8, 60]} fov={45} />
+      <PerspectiveCamera makeDefault position={[0, 8, 45]} fov={45} />
       <OrbitControls ref={controlsRef} enablePan={false} enableZoom={true} minDistance={30} maxDistance={120} autoRotate={rotationSpeed === 0 && sceneState === 'FORMED'} autoRotateSpeed={0.3} maxPolarAngle={Math.PI / 1.7} />
 
       <color attach="background" args={['#000300']} />
@@ -483,7 +483,7 @@ const GestureController = ({ onGesture, onMove, onStatus, debugMode }: any) => {
                  if (debugMode) onStatus(`DETECTED: ${name}`);
               }
               if (results.landmarks.length > 0) {
-                const speed = (0.5 - results.landmarks[0][0].x) * 0.15;
+                const speed = (0.5 - results.landmarks[0][0].x) * 0.25;
                 onMove(Math.abs(speed) > 0.01 ? speed : 0);
               }
             } else { onMove(0); if (debugMode) onStatus("AI READY: NO HAND"); }
@@ -509,6 +509,53 @@ export default function GrandTreeApp() {
   const [rotationSpeed, setRotationSpeed] = useState(0);
   const [aiStatus, setAiStatus] = useState("INITIALIZING...");
   const [debugMode, setDebugMode] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const musicPlayed = useRef(false);
+
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio('/music/music.mp3');
+    audioRef.current.loop = true; // Loop the music
+    audioRef.current.volume = 0.5; // Set default volume
+
+    // Function to play music
+    const playMusic = async () => {
+      if (audioRef.current && !musicPlayed.current) {
+        try {
+          await audioRef.current.play();
+          musicPlayed.current = true;
+        } catch (error) {
+          // Ignore autoplay failure, will try again on user interaction
+        }
+      }
+    };
+
+    // Try to play on first mount (will likely fail in modern browsers)
+    playMusic();
+
+    // Event listeners for user interaction
+    const handleUserInteraction = () => playMusic();
+    
+    // Listen for various user interaction events
+    window.addEventListener('mousemove', handleUserInteraction);
+    window.addEventListener('click', handleUserInteraction);
+    window.addEventListener('keydown', handleUserInteraction);
+    window.addEventListener('touchstart', handleUserInteraction);
+    
+    return () => {
+      // Cleanup event listeners
+      window.removeEventListener('mousemove', handleUserInteraction);
+      window.removeEventListener('click', handleUserInteraction);
+      window.removeEventListener('keydown', handleUserInteraction);
+      window.removeEventListener('touchstart', handleUserInteraction);
+      
+      // Cleanup audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div style={{ width: '100vw', height: '100vh', backgroundColor: '#000', position: 'relative', overflow: 'hidden' }}>
