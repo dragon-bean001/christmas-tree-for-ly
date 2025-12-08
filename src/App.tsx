@@ -2,7 +2,6 @@ import { useState, useMemo, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, extend } from '@react-three/fiber';
 import {
   OrbitControls,
-  Environment,
   PerspectiveCamera,
   shaderMaterial,
   Float,
@@ -20,8 +19,8 @@ import { GestureRecognizer, FilesetResolver, DrawingUtils } from "@mediapipe/tas
 const TOTAL_NUMBERED_PHOTOS = 35;
 // 修改：将 top.jpg 加入到数组开头
 const bodyPhotoPaths = [
-  '/photos/top.jpg',
-  ...Array.from({ length: TOTAL_NUMBERED_PHOTOS }, (_, i) => `/photos/${i + 1}.jpg`)
+  `${import.meta.env.BASE_URL}photos/top.jpg`,
+  ...Array.from({ length: TOTAL_NUMBERED_PHOTOS }, (_, i) => `${import.meta.env.BASE_URL}photos/${i + 1}.jpg`)
 ];
 
 // --- 视觉配置 ---
@@ -396,7 +395,7 @@ const Experience = ({ sceneState, rotationSpeed }: { sceneState: 'CHAOS' | 'FORM
 
       <color attach="background" args={['#000300']} />
       <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-      <Environment preset="night" background={false} />
+      {/* <Environment preset="night" background={false} /> */}
 
       <ambientLight intensity={0.4} color="#003311" />
       <pointLight position={[30, 30, 30]} intensity={100} color={CONFIG.colors.warmLight} />
@@ -514,7 +513,7 @@ export default function GrandTreeApp() {
 
   // Initialize audio element
   useEffect(() => {
-    audioRef.current = new Audio('/music/music.mp3');
+    audioRef.current = new Audio(`${import.meta.env.BASE_URL}music/music.mp3`);
     audioRef.current.loop = true; // Loop the music
     audioRef.current.volume = 0.5; // Set default volume
 
